@@ -23,7 +23,7 @@ export type ExchangeRateResponse = {
 //         "Accept-Encoding": "gzip, deflate, br",
 //         Connection: "keep-alive",
 //         Origin: "https://landing-dev.efexpay.com",
-//         "User-Agent": "CustomApp/1.0", // Puede ajustar esto según sea necesario
+//         "User-Agent": "CustomApp/1.0",
 //       },
 //     },
 //   );
@@ -61,7 +61,6 @@ export const fetchExchangeRate = async (
   currency: string,
   des_currency: string,
 ): Promise<ExchangeRateResponse> => {
-  // Simulamos una llamada a API con un delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return new Promise((resolve) => {
