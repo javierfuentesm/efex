@@ -25,7 +25,7 @@ import { currency, OPTIONS_OBJECT_FOR_CONVERTER } from "../utils/helpers.ts";
 import { useQuery } from "@tanstack/react-query";
 import { ExchangeRateResponse, fetchExchangeRate } from "../utils/api.ts";
 
-const TIMEOUT = 13;
+const TIMEOUT = 60;
 
 type ConversionHistory = {
   id: number;
@@ -88,6 +88,7 @@ export const CurrencyConverter = () => {
     queryFn: () => fetchExchangeRate(fromCurrency, toCurrency),
   });
 
+  console.log("exchangeRateData", exchangeRateData);
   const fromAmount =
     inputCurrency === "from"
       ? inputAmount
@@ -119,8 +120,8 @@ export const CurrencyConverter = () => {
         toAmount,
         rate:
           inputCurrency === "from"
-            ? exchangeRateData.sell
-            : exchangeRateData.buy,
+            ? exchangeRateData.buy
+            : exchangeRateData.sell,
         timestamp: Date.now(),
       };
       setConversionHistory((prevHistory) => [...prevHistory, newConversion]);
@@ -279,9 +280,9 @@ export const CurrencyConverter = () => {
         </Button>
       </VStack>
       {conversionHistory.length > 0 && (
-        <VStack mt={6} align="stretch" maxWidth="100%">
+        <VStack mt={6} align="stretch" maxWidth="100%" overflow={"auto"}>
           <Heading size="md">Historial de Conversiones</Heading>
-          <Table variant="simple">
+          <Table variant="simple" maxW={"100%"}>
             <Thead>
               <Tr>
                 <Th>Fecha</Th>
