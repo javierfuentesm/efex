@@ -55,14 +55,14 @@ const calculateDerivedAmount = ({
   if (amount === "" || amount === "0" || !buyRate || !sellRate) return "";
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "";
-  if (isFromCurrency) {
-    return isMainCurrency
+  if (isMainCurrency) {
+    return isFromCurrency
       ? (parsed * buyRate).toFixed(3)
       : (parsed / sellRate).toFixed(3);
   } else {
-    return isMainCurrency
-      ? (parsed / buyRate).toFixed(3)
-      : (parsed * sellRate).toFixed(3);
+    return isFromCurrency
+      ? (parsed / sellRate).toFixed(3)
+      : (parsed * buyRate).toFixed(3);
   }
 };
 
@@ -128,20 +128,14 @@ export const CurrencyConverter = () => {
   };
 
   const invertOrder = () => {
+    // Swap currencies
+    const tempCurrency = fromCurrency;
     setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-    setInputCurrency(inputCurrency === "from" ? "to" : "from");
+    setToCurrency(tempCurrency);
 
-    if (exchangeRateData) {
-      const newAmount = calculateDerivedAmount({
-        amount: inputAmount,
-        buyRate: exchangeRateData.buy,
-        sellRate: exchangeRateData.sell,
-        isFromCurrency: inputCurrency === "from",
-        isMainCurrency: !exchangeRateData.is_main_currency,
-      });
-      setInputAmount(newAmount);
-    }
+    // Reset input values
+    setInputAmount("0");
+    setInputCurrency("from");
   };
 
   const handleFromAmountChange = (value: string) => {
