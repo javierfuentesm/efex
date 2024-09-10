@@ -1,5 +1,7 @@
+import { ErrorScreen } from "../components/ErrorScreen.tsx";
+
 import { useState } from "react";
-import { RefreshTimer } from "./RefreshTimer";
+import { RefreshTimer } from "../components/RefreshTimer.tsx";
 import {
   Flex,
   Heading,
@@ -18,12 +20,12 @@ import {
   Td,
 } from "@chakra-ui/react";
 import InvertOrder from "../assets/inverOrder.svg";
-import { CurrencyInput } from "./CurrencyInput.tsx";
+import { CurrencyInput } from "../components/CurrencyInput.tsx";
 import { currency, OPTIONS_OBJECT_FOR_CONVERTER } from "../utils/helpers.ts";
 import { useQuery } from "@tanstack/react-query";
 import { ExchangeRateResponse, fetchExchangeRate } from "../utils/api.ts";
 
-const TIMEOUT = 4;
+const TIMEOUT = 13;
 
 type ConversionHistory = {
   id: number;
@@ -50,8 +52,9 @@ const calculateDerivedAmount = ({
   isFromCurrency,
   isMainCurrency,
 }: CalculateAmountParams): string => {
-  if (amount === "0" || !buyRate || !sellRate) return "0";
+  if (amount === "" || amount === "0" || !buyRate || !sellRate) return "";
   const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "";
   if (isFromCurrency) {
     return isMainCurrency
       ? (parsed * buyRate).toFixed(3)
@@ -77,6 +80,8 @@ export const CurrencyConverter = () => {
   const {
     data: exchangeRateData,
     isLoading,
+    isError,
+    error,
     refetch,
   } = useQuery<ExchangeRateResponse, Error>({
     queryKey,
@@ -118,7 +123,6 @@ export const CurrencyConverter = () => {
             : exchangeRateData.buy,
         timestamp: Date.now(),
       };
-
       setConversionHistory((prevHistory) => [...prevHistory, newConversion]);
     }
   };
@@ -150,11 +154,22 @@ export const CurrencyConverter = () => {
     setInputCurrency("to");
   };
 
+  if (isError) {
+    return (
+      <ErrorScreen
+        message={
+          error?.message || "An error occurred while fetching exchange rates."
+        }
+        onRetry={refetch}
+      />
+    );
+  }
+
   return (
     <VStack
-      maxWidth="676px"
-      minH="672px"
-      minW="676px"
+      maxWidth={{ base: "100%", md: "676px" }}
+      minH={{ base: "auto", md: "672px" }}
+      minW={{ base: "100%", md: "676px" }}
       margin="auto"
       padding={4}
       borderWidth={1}
@@ -173,12 +188,12 @@ export const CurrencyConverter = () => {
           Convertir
         </Heading>
         <Text>Convierte la cantidad que quieras a una moneda diferente.</Text>
-        <Button onClick={() => refetch()}>refresh dataa</Button>
         <VStack spacing={"8px"} alignItems={"flex-start"}>
           <Text fontSize={"14px"} color={"#9E9E9E"} mb={2}>
             De {OPTIONS_OBJECT_FOR_CONVERTER[fromCurrency].text}
           </Text>
           <CurrencyInput
+            name={"from"}
             currency={fromCurrency}
             setCurrency={setFromCurrency}
             amount={fromAmount}
@@ -204,6 +219,7 @@ export const CurrencyConverter = () => {
             A {OPTIONS_OBJECT_FOR_CONVERTER[toCurrency].text}
           </Text>
           <CurrencyInput
+            name={"to"}
             currency={toCurrency}
             setCurrency={setToCurrency}
             amount={toAmount}
@@ -257,6 +273,7 @@ export const CurrencyConverter = () => {
           onClick={handleConvert}
           color={"white"}
           mt={"40px"}
+          isDisabled={isLoading || fromAmount === "0" || toAmount === "0"}
         >
           Realizar conversión
         </Button>
