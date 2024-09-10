@@ -41,7 +41,6 @@ type CalculateAmountParams = {
   amount: string;
   buyRate: number;
   sellRate: number;
-  isFromCurrency: boolean;
   isMainCurrency: boolean;
 };
 
@@ -49,21 +48,14 @@ const calculateDerivedAmount = ({
   amount,
   buyRate,
   sellRate,
-  isFromCurrency,
   isMainCurrency,
 }: CalculateAmountParams): string => {
   if (amount === "" || amount === "0" || !buyRate || !sellRate) return "";
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "";
-  if (isMainCurrency) {
-    return isFromCurrency
-      ? (parsed * buyRate).toFixed(3)
-      : (parsed / sellRate).toFixed(3);
-  } else {
-    return isFromCurrency
-      ? (parsed / sellRate).toFixed(3)
-      : (parsed * buyRate).toFixed(3);
-  }
+
+  const rate = isMainCurrency ? buyRate : 1 / buyRate;
+  return (parsed * rate).toFixed(3);
 };
 
 export const CurrencyConverter = () => {
@@ -88,6 +80,10 @@ export const CurrencyConverter = () => {
     queryFn: () => fetchExchangeRate(fromCurrency, toCurrency),
   });
 
+  const isSelectedFromCurrencyMain =
+    exchangeRateData?.currency === fromCurrency &&
+    exchangeRateData?.is_main_currency;
+
   const fromAmount =
     inputCurrency === "from"
       ? inputAmount
@@ -95,9 +91,9 @@ export const CurrencyConverter = () => {
           amount: inputAmount,
           buyRate: exchangeRateData?.buy ?? 0,
           sellRate: exchangeRateData?.sell ?? 0,
-          isFromCurrency: false,
-          isMainCurrency: exchangeRateData?.is_main_currency ?? false,
+          isMainCurrency: !isSelectedFromCurrencyMain,
         });
+
   const toAmount =
     inputCurrency === "to"
       ? inputAmount
@@ -105,8 +101,7 @@ export const CurrencyConverter = () => {
           amount: inputAmount,
           buyRate: exchangeRateData?.buy ?? 0,
           sellRate: exchangeRateData?.sell ?? 0,
-          isFromCurrency: true,
-          isMainCurrency: exchangeRateData?.is_main_currency ?? false,
+          isMainCurrency: isSelectedFromCurrencyMain,
         });
 
   const handleConvert = () => {
