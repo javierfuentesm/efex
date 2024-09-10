@@ -84,7 +84,7 @@ TanStack Query (formerly React Query) was used for "state management" and data f
 - Easy pagination and infinite scrolling support.
 - Built-in devtools for debugging.
 
-Given these features, we didn't see an immediate need for additional state management solutions like Redux or Context API for this project's current scope.
+Given these features, I didn't see an immediate need for additional state management solutions like Redux or Context API for this project's current scope.
 
 ### UI Components
 I chose Chakra UI as the component library for this project. Its benefits include:
