@@ -88,7 +88,6 @@ export const CurrencyConverter = () => {
     queryFn: () => fetchExchangeRate(fromCurrency, toCurrency),
   });
 
-  console.log("exchangeRateData", exchangeRateData);
   const fromAmount =
     inputCurrency === "from"
       ? inputAmount
