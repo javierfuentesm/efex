@@ -57,3 +57,46 @@ To view the test report:
 ```
 npx playwright show-report
 ```
+
+
+## Technical Decisions
+
+### API Simulation
+Due to CORS issues with the original API, a JavaScript function was implemented to simulate backend behavior. While this allows for development and testing without backend dependencies, it's important to note that using the actual API would be ideal in a production environment. The simulation approach has some limitations:
+
+- It doesn't allow for intercepting endpoints with Playwright for testing error scenarios or loading states, which would be possible with a real API.
+- It may not accurately represent all possible API responses or edge cases.
+
+### Testing with Playwright
+I chose Playwright for end-to-end testing due to its numerous benefits:
+
+- Faster test execution compared to other frameworks.
+- Cross-browser testing capabilities.
+- Automatic wait functionality, reducing the need for explicit waits.
+- Powerful tracing feature for debugging failed tests.
+- Strong TypeScript support.
+
+### State Management
+TanStack Query (formerly React Query) was used for "state management" and data fetching. Its benefits include:
+
+- Simplified data fetching and caching.
+- Automatic background refetching.
+- Easy pagination and infinite scrolling support.
+- Built-in devtools for debugging.
+
+Given these features, we didn't see an immediate need for additional state management solutions like Redux or Context API for this project's current scope.
+
+### UI Components
+I chose Chakra UI as the component library for this project. Its benefits include:
+
+- Highly customizable and accessible components out of the box.
+- Excellent theming support.
+- Built-in dark mode. (if required in the future)
+- Responsive design utilities.
+- Strong TypeScript support.
+
+## Deployment
+
+The application is deployed and accessible at https://efex.vercel.app
+
+
