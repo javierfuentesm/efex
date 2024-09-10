@@ -19,6 +19,7 @@ export class ConverterPage {
   readonly loadingSpinner: Locator;
   readonly fromCurrencySelectArrow: Locator;
   readonly toCurrencySelectArrow: Locator;
+  readonly exchangeRateText: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -54,6 +55,7 @@ export class ConverterPage {
     this.toCurrencySelectArrow = page
       .getByTestId("currency-wrapper-to")
       .locator("svg");
+    this.exchangeRateText = page.getByTestId("exchange-rate");
   }
 
   goto() {
@@ -149,5 +151,29 @@ export class ConverterPage {
       name: currency,
     });
     return option.isDisabled();
+  }
+
+  async getExchangeRate(): Promise<number> {
+    const rateText = await this.exchangeRateText.textContent();
+    if (!rateText) return 0;
+
+    const match = rateText.match(/\$\s*(\d+(\.\d+)?)\s+[A-Z]{3}/);
+
+    if (match && match[1]) {
+      return parseFloat(match[1]);
+    }
+
+    const fallbackMatch = rateText.match(/(\d+(\.\d{1,2})?)/);
+    return fallbackMatch ? parseFloat(fallbackMatch[1]) : 0;
+  }
+
+  async getFromAmount(): Promise<number> {
+    const value = await this.fromInput.inputValue();
+    return parseFloat(value);
+  }
+
+  async getToAmount(): Promise<number> {
+    const value = await this.toInput.inputValue();
+    return parseFloat(value);
   }
 }

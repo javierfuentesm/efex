@@ -64,4 +64,34 @@ test.describe("test all the functionally in the Currency converter", () => {
     // Verify that EUR is now disabled in the 'from' currency input
     expect(await converterPage.isCurrencyDisabledInFromInput("EUR")).toBe(true);
   });
+
+  test("verify exchange rate calculation", async () => {
+    // Input a value in the 'from' field
+    await converterPage.fillFromInput("1");
+    await converterPage.validateConversionOccurred();
+
+    // Get the exchange rate, 'from' amount, and 'to' amount
+    const exchangeRate = await converterPage.getExchangeRate();
+    const fromAmount = await converterPage.getFromAmount();
+    const toAmount = await converterPage.getToAmount();
+
+    // Calculate the expected 'to' amount based on the exchange rate
+    const expectedToAmount = fromAmount * exchangeRate;
+
+    // Verify that the calculated amount matches the displayed amount (allowing for small rounding differences)
+    expect(Math.abs(toAmount - expectedToAmount)).toBeLessThan(0.01);
+
+    // Now test the reverse conversion
+    await converterPage.clickAndValidateInvertOrder();
+    await converterPage.fillFromInput("100");
+    await converterPage.validateConversionOccurred();
+
+    const newExchangeRate = await converterPage.getExchangeRate();
+    const newFromAmount = await converterPage.getFromAmount();
+    const newToAmount = await converterPage.getToAmount();
+
+    const newExpectedToAmount = newFromAmount / newExchangeRate;
+
+    expect(Math.abs(newToAmount - newExpectedToAmount)).toBeLessThan(0.01);
+  });
 });
