@@ -228,7 +228,9 @@ export const CurrencyConverter = () => {
         >
           <Flex justify="space-between">
             <Text>Tasa de cambio</Text>
-            <Text fontWeight={700}>{exchangeRateData?.exchange_label}</Text>
+            <Text data-testid="exchange-rate" fontWeight={700}>
+              {exchangeRateData?.exchange_label}
+            </Text>
           </Flex>
 
           {fromAmount !== "0" && toAmount !== "0" && (
